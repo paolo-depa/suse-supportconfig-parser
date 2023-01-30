@@ -1,0 +1,25 @@
+{
+  "name": "suse-supportconfig-parser",
+  "displayName": "SUSE supportconfig parser",
+  "description": "A parser for the SUSE supportconfig files",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "suse-supportconfig",
+      "aliases": ["SUSE SupportConfig", "suse-supportconfig"],
+      "extensions": [".txt"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "suse-supportconfig",
+      "scopeName": "source.susesupportconfig",
+      "path": "./syntaxes/suse-supportconfig.tmLanguage.json"
+    }]
+  }
+}
