@@ -3,29 +3,40 @@
 	"name": "SUSE SupportConfig",
 	"patterns": [
 		{
-			"include": "#keywords"
+			"include": "#entity"
 		},
 		{
-			"include": "#strings"
+			"include": "#commentblock"
+		},
+		{
+			"include": "#comment"
 		}
 	],
 	"repository": {
-		"keywords": {
+		"entity": {
 			"patterns": [{
-				"name": "keyword.control.suse-supportconfig",
-				"match": "\\b(if|while|for|return)\\b"
+				"name": "entity.other",
+				"begin": "#=",
+				"end": "=#",
+				"patterns": [
+					{
+						"name": "emphasis",
+						"match": "\\[ [\\w\\s]* \\]"
+					}
+				]
 			}]
 		},
-		"strings": {
-			"name": "string.quoted.double.suse-supportconfig",
-			"begin": "\"",
-			"end": "\"",
-			"patterns": [
-				{
-					"name": "constant.character.escape.suse-supportconfig",
-					"match": "\\\\."
-				}
-			]
+		"commentblock": {
+			"patterns": [{
+				"name": "comment.block",
+				"match": "^=*$"
+			}]
+		},
+		"comment": {
+			"patterns": [{
+				"name": "keyword.control.less",
+				"match": "^# .*$"
+			}]
 		}
 	},
 	"scopeName": "source.susesupportconfig"
