@@ -9,33 +9,33 @@
 			"include": "#commentblock"
 		},
 		{
-			"include": "#comment"
+			"include": "#command"
 		}
 	],
 	"repository": {
 		"entity": {
 			"patterns": [{
-				"name": "entity.other",
+				"name": "comment.line",
 				"begin": "#=",
 				"end": "=#",
 				"patterns": [
 					{
 						"name": "emphasis",
-						"match": "\\[ [\\w\\s]* \\]"
+						"match": "\\[[\\w\\d\\s]*\\]"
 					}
 				]
 			}]
 		},
 		"commentblock": {
 			"patterns": [{
-				"name": "comment.block",
+				"name": "comment.line",
 				"match": "^=*$"
 			}]
 		},
-		"comment": {
+		"command": {
 			"patterns": [{
 				"name": "keyword.control.less",
-				"match": "^# .*$"
+				"match": "^# (?!Verification Status).*$"
 			}]
 		}
 	},
