@@ -15,27 +15,25 @@
 	"repository": {
 		"entity": {
 			"patterns": [{
-				"name": "comment.line",
-				"begin": "#=",
-				"end": "=#",
-				"patterns": [
-					{
-						"name": "emphasis",
-						"match": "\\[[\\w\\d\\s]*\\]"
-					}
-				]
+				"name": "entity.suse-supportconfig",
+				"match": "(#=*)(\\[[\\w\\s]*\\](=*#))",
+				"captures": {
+					"1":{ "name": "comment.line.suse-supportconfig"},
+					"2":{ "name": "constant.language.suse-supportconfig"},
+					"3":{ "name": "comment.line.suse-supportconfig"}
+				}
 			}]
 		},
 		"commentblock": {
 			"patterns": [{
-				"name": "comment.line",
-				"match": "^=*$"
+				"name": "comment.block",
+				"match": "={70,}"
 			}]
 		},
 		"command": {
 			"patterns": [{
-				"name": "keyword.control.less",
-				"match": "^# (?!Verification Status).*$"
+				"name": "string.quoted.suse-supportconfig",
+				"match": "# /.*$"
 			}]
 		}
 	},

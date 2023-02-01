@@ -1,0 +1,29 @@
+#ECHO
+Highlighting demo using dark theme.
+
+#BEGIN_COMP SC  Marker with folding button in margin
+
+#USERINPUTBEGIN
+
+#MYCOMMAND Example command with parameters      
+-10            integer parameter
++1.1e6         float parameter
+T              Boolean parameter
+Hello  World   string parameter
+
+#USERINPUTEND
+
+COMMAND  Commands lacking the # character are comments 
+15
+
+#END_COMP SC  End marker and component ID
+
+#COMMAND
+500           Comment
+
+#RUN
+
+#ANOTHER_CMD
+3.14 Comment
+
+#END

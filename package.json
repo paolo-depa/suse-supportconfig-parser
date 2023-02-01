@@ -3,23 +3,65 @@
   "displayName": "SUSE supportconfig parser",
   "description": "A parser for the SUSE supportconfig files",
   "version": "0.0.1",
+  "publisher": "paolo-depa",
+  "repository": {
+    "type": "git",
+    "url": "https://https://github.com/paolo-depa/suse-supportconfig-parser.git"
+  },
+  "license": "MIT",
   "engines": {
     "vscode": "^1.74.0"
   },
   "categories": [
-    "Programming Languages"
+    "Programming Languages",
+    "Formatters"
   ],
+  "activationEvents": [
+    "onLanguage:suse-supportconfig"
+  ],
+  "main": "./out/extension.js",
   "contributes": {
-    "languages": [{
-      "id": "suse-supportconfig",
-      "aliases": ["SUSE SupportConfig", "suse-supportconfig"],
-      "extensions": [".txt"],
-      "configuration": "./language-configuration.json"
-    }],
+    "languages": [
+      {
+        "id": "suse-supportconfig",
+        "aliases": [
+          "SUSE SupportConfig",
+          "suse-supportconfig"
+        ],
+        "extensions": [
+          ".txt"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
     "grammars": [{
       "language": "suse-supportconfig",
       "scopeName": "source.susesupportconfig",
       "path": "./syntaxes/suse-supportconfig.tmLanguage.json"
     }]
-  }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.0.0",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "16.x",
+    "@types/vscode": "^1.74.0",
+    "@typescript-eslint/eslint-plugin": "^5.48.2",
+    "@typescript-eslint/parser": "^5.48.2",
+    "eslint": "^8.28.0",
+    "glob": "^8.0.3",
+    "mocha": "^10.1.0",
+    "typescript": "^4.9.3"
+  },
+  "bugs": {
+    "url": "https://github.com/paolo-depa/suse-supportconfig-parser/issues"
+  },
+  "homepage": "https://github.com/paolo-depa/suse-supportconfig-parser#readme",
+  "author": "Paolo De Pasquale"
 }
