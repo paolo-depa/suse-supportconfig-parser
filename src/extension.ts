@@ -25,10 +25,15 @@ class SupportConfigDocumentSymbolProvider implements vscode.DocumentSymbolProvid
 
             var symbolkind = vscode.SymbolKind.Function
 
-            for (let i = 0; i < document.lineCount; i++) {
-                const line = document.lineAt(i);
+            // Loop until the last-but one row
+            for (let i = 0; i < document.lineCount - 1; i++) {
+                var line = document.lineAt(i);
+                var nextline = document.lineAt(i + 1)
+                var sectionTask = "Null"    // nextline is needed to set the sectionTask accordingly
 
-                if (line.text.startsWith("#=")) {
+                if (line.text.startsWith("#=") &&
+                    !nextline.text.startsWith("#=")) { // going to the leaf in "nested" structures
+
                     // sectionType matches the content between square brackets of '#==[ XXXXXXX ]=====================#'
                     var regex = /(#=*\[ )([\w\s]*)(\]=*#)/
                     const sectionType = line.text.replace(regex, "$2")
@@ -64,14 +69,10 @@ class SupportConfigDocumentSymbolProvider implements vscode.DocumentSymbolProvid
                             break;
                     }
 
-                    var sectionTask = "Null"
-                    if (i < document.lineCount - 1) {
-                        // There is at least another line after #=====...
-                        var nextline = document.lineAt(i + 1)
-                        if (!nextline.isEmptyOrWhitespace) {
-                            regex = /(# )(.*)/
-                            sectionTask = nextline.text.replace(regex, "$2")
-                        }
+                    // Setting sectionTask from the line below '#==[ XXXXXXX ]=====================#'
+                    if (!nextline.isEmptyOrWhitespace) {
+                        regex = /(# )(.*)/
+                        sectionTask = nextline.text.replace(regex, "$2")
                     }
 
                     const symbol = new vscode.DocumentSymbol(
@@ -79,7 +80,6 @@ class SupportConfigDocumentSymbolProvider implements vscode.DocumentSymbolProvid
                         sectionType,
                         symbolkind,
                         line.range, line.range)
-
 
                     nodes[nodes.length - 1].push(symbol)
                 }

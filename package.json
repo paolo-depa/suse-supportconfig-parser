@@ -34,11 +34,13 @@
         "configuration": "./language-configuration.json"
       }
     ],
-    "grammars": [{
-      "language": "suse-supportconfig",
-      "scopeName": "source.susesupportconfig",
-      "path": "./syntaxes/suse-supportconfig.tmLanguage.json"
-    }]
+    "grammars": [
+      {
+        "language": "suse-supportconfig",
+        "scopeName": "source.susesupportconfig",
+        "path": "./syntaxes/suse-supportconfig.tmLanguage.json"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
@@ -63,5 +65,8 @@
     "url": "https://github.com/paolo-depa/suse-supportconfig-parser/issues"
   },
   "homepage": "https://github.com/paolo-depa/suse-supportconfig-parser#readme",
-  "author": "Paolo De Pasquale"
+  "author": "Paolo De Pasquale",
+  "dependencies": {
+    "vsce": "^2.15.0"
+  }
 }
