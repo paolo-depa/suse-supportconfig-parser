@@ -4,12 +4,20 @@
 
 import * as vscode from 'vscode';
 
+const MIN_RANGE_LENGTH = 2;
+
 export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.languages.registerDocumentSymbolProvider(
             { scheme: "file", language: "suse-supportconfig" },
             new SupportConfigDocumentSymbolProvider()
+        )
+    );
+    context.subscriptions.push(
+        vscode.languages.registerFoldingRangeProvider(
+            { scheme: "file", language: "suse-supportconfig" },
+            new SupportConfigFoldingRangeProvider()
         )
     );
 }
@@ -75,6 +83,7 @@ class SupportConfigDocumentSymbolProvider implements vscode.DocumentSymbolProvid
                         sectionTask = nextline.text.replace(regex, "$2")
                     }
 
+
                     const symbol = new vscode.DocumentSymbol(
                         sectionTask,
                         sectionType,
@@ -89,3 +98,37 @@ class SupportConfigDocumentSymbolProvider implements vscode.DocumentSymbolProvid
         });
     }
 }
+
+export class SupportConfigFoldingRangeProvider implements vscode.FoldingRangeProvider {
+    provideFoldingRanges(
+        document: vscode.TextDocument,
+        context: vscode.FoldingContext,
+        token: vscode.CancellationToken
+    ): vscode.ProviderResult<vscode.FoldingRange[]> {
+        let ranges: vscode.FoldingRange[] = [];
+        var startFoldingRange = -1;
+
+
+        for (let i = 0; i < document.lineCount; i++) {
+            let line = document.lineAt(i);
+
+            if (line.text.startsWith('#==') || (i == document.lineCount -1)) {
+
+                if (startFoldingRange === -1){
+                    startFoldingRange = i;
+                } else {
+                    var rangelength = i - 1 - startFoldingRange;
+                    if (rangelength >= MIN_RANGE_LENGTH) {
+                        ranges.push(new vscode.FoldingRange(startFoldingRange, i-1, 0));
+                    }
+                    
+                    startFoldingRange = i;
+                }
+
+            }
+        }
+
+        return ranges;
+    }
+}
+
