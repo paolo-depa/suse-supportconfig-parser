@@ -4,7 +4,7 @@
 
 import * as vscode from 'vscode';
 
-const MIN_RANGE_LENGTH = 2;
+const MIN_RANGE_LENGTH: number = 2;
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -28,72 +28,8 @@ class SupportConfigDocumentSymbolProvider implements vscode.DocumentSymbolProvid
         document: vscode.TextDocument,
         token: vscode.CancellationToken): Promise<vscode.DocumentSymbol[]> {
         return new Promise((resolve, reject) => {
-            const symbols: vscode.DocumentSymbol[] = [];
-            const nodes = [symbols]
 
-            var symbolkind = vscode.SymbolKind.Function
-
-            // Loop until the last-but one row
-            for (let i = 0; i < document.lineCount - 1; i++) {
-                var line = document.lineAt(i);
-                var nextline = document.lineAt(i + 1)
-                var sectionTask = "Null"    // nextline is needed to set the sectionTask accordingly
-
-                if (line.text.startsWith("#=") &&
-                    !nextline.text.startsWith("#=")) { // going to the leaf in "nested" structures
-
-                    // sectionType matches the content between square brackets of '#==[ XXXXXXX ]=====================#'
-                    var regex = /(#=*\[ )([\w\s]*)(\]=*#)/
-                    const sectionType = line.text.replace(regex, "$2")
-
-                    switch (sectionType.trim()) {
-                        case "Command":
-                            symbolkind = vscode.SymbolKind.Enum
-                            break;
-
-                        case "Configuration File":
-                        case "Log File":
-                            symbolkind = vscode.SymbolKind.File
-                            break;
-
-                        case "System":
-                            symbolkind = vscode.SymbolKind.Function
-                            break;
-
-                        case "Summary":
-                            symbolkind = vscode.SymbolKind.Array
-                            break;
-
-                        case "Verification":
-                            symbolkind = vscode.SymbolKind.Event
-                            break;
-
-                        case "Note":
-                            symbolkind = vscode.SymbolKind.Constant
-                            break;
-
-                        default:
-                            symbolkind = vscode.SymbolKind.Function
-                            break;
-                    }
-
-                    // Setting sectionTask from the line below '#==[ XXXXXXX ]=====================#'
-                    if (!nextline.isEmptyOrWhitespace) {
-                        regex = /(# )(.*)/
-                        sectionTask = nextline.text.replace(regex, "$2")
-                    }
-
-
-                    const symbol = new vscode.DocumentSymbol(
-                        sectionTask,
-                        sectionType,
-                        symbolkind,
-                        line.range, line.range)
-
-                    nodes[nodes.length - 1].push(symbol)
-                }
-            }
-
+            const symbols: vscode.DocumentSymbol[] = getSymbols(document);
             resolve(symbols);
         });
     }
@@ -108,27 +44,117 @@ export class SupportConfigFoldingRangeProvider implements vscode.FoldingRangePro
         let ranges: vscode.FoldingRange[] = [];
         var startFoldingRange = -1;
 
+        const symbols: vscode.DocumentSymbol[] = getSymbols(document);
 
-        for (let i = 0; i < document.lineCount; i++) {
-            let line = document.lineAt(i);
-
-            if (line.text.startsWith('#==') || (i == document.lineCount -1)) {
-
-                if (startFoldingRange === -1){
-                    startFoldingRange = i;
-                } else {
-                    var rangelength = i - 1 - startFoldingRange;
-                    if (rangelength >= MIN_RANGE_LENGTH) {
-                        ranges.push(new vscode.FoldingRange(startFoldingRange, i-1, 0));
-                    }
-                    
-                    startFoldingRange = i;
-                }
-
-            }
-        }
+        symbols.forEach(element => {
+            ranges.push(new vscode.FoldingRange(element.range.start.line,element.range.end.line));
+        });
 
         return ranges;
     }
 }
 
+function getSymbols(document: vscode.TextDocument) {
+    const symbols: vscode.DocumentSymbol[] = [];
+    const nodes = [symbols];
+    let symbol: vscode.DocumentSymbol | null= null;
+
+    for (let i = 0; i < document.lineCount; i++) {
+        let line = document.lineAt(i);
+
+        if (line.text.startsWith('#==')) {
+
+            if (symbol != null) {
+                setSymbolRangeEnd(symbol, i - 1)
+                nodes[nodes.length - 1].push(symbol)
+            }
+
+            symbol = createSymbol(document, i);
+
+        }
+
+        if ((i === document.lineCount - 1)  && (symbol != null)){
+            setSymbolRangeEnd(symbol, i - 1)
+            nodes[nodes.length - 1].push(symbol)
+        }
+
+    }
+
+    return symbols
+
+}
+
+function createSymbol(document: vscode.TextDocument, currentLine: number) {
+
+    let symbolkind = vscode.SymbolKind.Function
+
+    var line = document.lineAt(currentLine);
+    var nextline = document.lineAt(currentLine + 1)
+    var sectionTask = "Null"    // nextline is needed to set the sectionTask accordingly
+
+    if (line.text.startsWith("#=") &&
+        nextline.text.startsWith("#=")) {
+        return null;
+    }
+
+    // sectionType matches the content between square brackets of '#==[ XXXXXXX ]=====================#'
+    var regex = /(#=*\[ )([\w\s]*)(\]=*#)/
+    const sectionType = line.text.replace(regex, "$2")
+
+    switch (sectionType.trim()) {
+        case "Command":
+            symbolkind = vscode.SymbolKind.Enum
+            break;
+
+        case "Configuration File":
+        case "Log File":
+            symbolkind = vscode.SymbolKind.File
+            break;
+
+        case "System":
+            symbolkind = vscode.SymbolKind.Function
+            break;
+
+        case "Summary":
+            symbolkind = vscode.SymbolKind.Array
+            break;
+
+        case "Verification":
+            symbolkind = vscode.SymbolKind.Event
+            break;
+
+        case "Note":
+            symbolkind = vscode.SymbolKind.Constant
+            break;
+
+        default:
+            symbolkind = vscode.SymbolKind.Function
+            break;
+    }
+
+    // Setting sectionTask from the line below '#==[ XXXXXXX ]=====================#'
+    if (!nextline.isEmptyOrWhitespace) {
+        regex = /(# )(.*)/
+        sectionTask = nextline.text.replace(regex, "$2")
+    }
+
+    const symbol = new vscode.DocumentSymbol(
+        sectionTask,
+        sectionType,
+        symbolkind,
+        line.range, line.range)
+
+
+    return symbol;
+}
+
+function setSymbolRangeEnd(symbol: vscode.DocumentSymbol | null, end: number) {
+    if (symbol != null) {
+        let range = new vscode.Range(symbol!.range.start, new vscode.Position(end, 0))
+        symbol!.range = range;
+        symbol!.selectionRange = range;
+    }
+
+    return symbol;
+
+}
