@@ -9,6 +9,7 @@
     "url": "https://https://github.com/paolo-depa/suse-supportconfig-parser.git"
   },
   "license": "MIT",
+  "icon": "images/suse-logo.png",
   "engines": {
     "vscode": "^1.74.0"
   },
@@ -30,8 +31,7 @@
         ],
         "extensions": [
           ".txt"
-        ],
-        "configuration": "./language-configuration.json"
+        ]
       }
     ],
     "grammars": [
